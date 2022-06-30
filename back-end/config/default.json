@@ -1,0 +1,4 @@
+{
+    "MONGO_URI":"mongodb+srv://fruits:ilovedad62358@cluster0.eohva.mongodb.net/interview?retryWrites=true&w=majority",
+    "jwtSecret":"topSecret"
+}
