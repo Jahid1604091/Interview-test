@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { AiOutlineLock } from 'react-icons/ai'
 import { IoIosArrowBack } from 'react-icons/io'
@@ -6,6 +6,7 @@ import Landing from '../layout/Landing'
 import axios from 'axios'
 const FormBankDetails = ({ prevStep, step, handleChange, formData }) => {
 
+    const [errors, setErrors] = useState([])
     const { bank_acc } = formData;
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -15,22 +16,37 @@ const FormBankDetails = ({ prevStep, step, handleChange, formData }) => {
         }
         else {
             //register
-            try {
-                const config = {
-                    headers: {
-                        'Content-Type': "application/json"
+            const register = async (form) => {
+                try {
+                    const config = {
+                        headers: {
+                            'Content-Type': "application/json"
+                        }
+                    }
+                    const body = JSON.stringify(form);
+                    const res = await axios.post('/api/users', body, config);
+                    if (errors.length === 0) {
+                        alert("Registered successfully!")
+                    }
+                } catch (err) {
+                    const errors = err.response.data.errors;
+                  
+                    if (errors) {
+                        setErrors(errors)
+                    }
+                    else{
+                        setErrors([])
                     }
                 }
-                const body = JSON.stringify(formData);
-                const res = axios.post('/api/users', body, config);
-                alert("Registered successfully!")
-            } catch (error) {
-                console.error(error.response.data)
             }
+            register(formData)
+
 
 
         }
     }
+
+
     return (
         <Wrapper>
             <div className="">
@@ -40,6 +56,7 @@ const FormBankDetails = ({ prevStep, step, handleChange, formData }) => {
                     </div>
                     <div className="col-md-6">
                         <div className="container">
+
                             <div className="row p-4">
                                 <div className="col-12">
                                     <div className="d-flex justify-content-between">
@@ -48,6 +65,14 @@ const FormBankDetails = ({ prevStep, step, handleChange, formData }) => {
                                     </div>
                                 </div>
                                 <div className="col-10 mt-4">
+                                      {
+                                           errors.length > 0 ?  errors.map((err, idx) => <div key={idx} className="alert alert-warning alert-dismissible fade show" role="alert">
+                                           {err.msg}
+                                           <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                         </div>) : null
+                                   
+                                        }
+
                                     <h2>Complete Your Profile!</h2>
                                     <p className="lead">For the purpose of industry regulation, your details are required.</p>
                                     <form >
@@ -82,6 +107,12 @@ const FormBankDetails = ({ prevStep, step, handleChange, formData }) => {
 
 const Wrapper = styled.section`
 
+li{
+    list-style-type:none ;
+    color:#fff ;
+    font-size:18px ;
+    text-transform:capitalize ;
+}
     .prevStep{
         background:transparent ;
         border:0 ;
